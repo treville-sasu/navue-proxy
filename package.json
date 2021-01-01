@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "navue-proxy",
+  "version": "1.0.0",
+  "description": "worker acting as a proxy for naVue external request. Allow CORS & Mixed content",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "prettier --write '**/*.{js,css,json,md}'",
+    "publish": "wrangler publish",
+    "serve": "wrangler dev --local-protocol=https",
+    "tail": "wrangler tail"
+  },
+  "author": "elmatou <marca@brenac.org>",
+  "license": "MIT",
+  "devDependencies": {
+    "prettier": "^1.18.2"
+  }
+}
