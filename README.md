@@ -1,4 +1,4 @@
-# 👷 `navue-proxy`
+# `navue-proxy`
 
 a worker proxing web request.
 
