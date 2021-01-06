@@ -9,25 +9,32 @@ const corsHeaders = {
 }
 
 async function handleRequest(request) {
-  const url = new URL(request.url)
-  const target = url.searchParams.get('cors')
+  try {
+    const url = new URL(request.url)
+    const target = url.searchParams.get('cors')
 
-  // Rewrite request to point to API url. This also makes the request mutable
-  // so we can add the correct Origin header to make the API server think
-  // that this request isn't cross-site.
-  request = new Request(target, request)
-  request.headers.set('Origin', new URL(target).origin)
-  let response = await fetch(request)
+    // Rewrite request to point to API url. This also makes the request mutable
+    // so we can add the correct Origin header to make the API server think
+    // that this request isn't cross-site.
+    request = new Request(target, request)
+    request.headers.set('Origin', new URL(target).origin)
+    let response = await fetch(request)
 
-  // Recreate the response so we can modify the headers
-  response = new Response(response.body, response)
-  // Set CORS headers
-  response.headers.set('Access-Control-Allow-Origin', '*')
-  // response.headers.set('Access-Control-Allow-Origin', url.origin)
-  // Append to/Add Vary header so browser will cache response correctly
-  response.headers.append('Vary', 'Origin')
+    // Recreate the response so we can modify the headers
+    response = new Response(response.body, response)
+    // Set CORS headers
+    response.headers.set('Access-Control-Allow-Origin', '*')
+    // response.headers.set('Access-Control-Allow-Origin', url.origin)
+    // Append to/Add Vary header so browser will cache response correctly
+    response.headers.append('Vary', 'Origin')
 
-  return response
+    return response
+  } catch {
+    return new Response(null, {
+      status: 400,
+      statusText: 'Bad Request. try with query: ?cors=http://...',
+    })
+  }
 }
 
 function handleOptions(request) {
@@ -67,22 +74,22 @@ function handleOptions(request) {
 
 addEventListener('fetch', event => {
   const request = event.request
-    if (request.method === 'OPTIONS') {
-      // Handle CORS preflight requests
-      event.respondWith(handleOptions(request))
-    } else if (
-      request.method === 'GET' ||
-      request.method === 'HEAD' ||
-      request.method === 'POST'
-    ) {
-      // Handle requests to the API server
-      event.respondWith(handleRequest(request))
-    } else {
-      event.respondWith(
-        new Response(null, {
-          status: 405,
-          statusText: 'Method Not Allowed',
-        }),
-      )
-    }
+  if (request.method === 'OPTIONS') {
+    // Handle CORS preflight requests
+    event.respondWith(handleOptions(request))
+  } else if (
+    request.method === 'GET' ||
+    request.method === 'HEAD' ||
+    request.method === 'POST'
+  ) {
+    // Handle requests to the API server
+    event.respondWith(handleRequest(request))
+  } else {
+    event.respondWith(
+      new Response(null, {
+        status: 405,
+        statusText: 'Method Not Allowed',
+      }),
+    )
+  }
 })
