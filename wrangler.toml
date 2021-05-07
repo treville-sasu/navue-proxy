@@ -1,0 +1,6 @@
+name = "navue-proxy"
+type = "javascript"
+workers_dev = true
+
+[dev]
+local_protocol="https"
